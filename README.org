@@ -1,0 +1,32 @@
+#+TITLE: cidata-mate-singularity-micromamba-snakemake
+
+This is cidata to install and configure Ubuntu with MATE desktop,
+singularity, micromamba and snakemake via [[https://ubuntu.com/server/docs/install/autoinstall][Ubuntu's autoinstall]]
+feature. It has a default user =ubuntu= with the password =ubuntu=.
+
+* Usage
+This example explains the preparation of an Ubuntu virtual machine via
+[[https://mac.getutm.app/][UTM]] in M1 Mac. It requires another Ubuntu at least once to make a
+cidata ISO file, but the file can be used repeatedly.
+
+** Make a cidata ISO file
+#+begin_src shell
+  sudo apt-get install cloud-image-utils
+  cloud-localds mycidata.iso user-data meta-data
+#+end_src
+
+The file =mycidata.iso= is the cidata ISO to automate installation of
+Ubuntu. Copy the file to your mac.
+
+** Install Ubuntu with the cidata ISO image
+
+In UTM install new Ubuntu virtual machine with (i) the cidata ISO file
+as the first removable USB (CD/DVD) drive, (ii) an Ubuntu live server
+ISO file as the second removable USB drive. During the installation
+answer "yes" to a question "Continue with autoinstall?". The virtual
+machine is turned off when the installation is finished; then restart
+the virtual machine after removal of both of the ISO files.
+
+* Notes
+- [2022-03-24 Thu] This cidata can use both for amd64 and aarch64, but
+  snakemake (via conda) installation is failed in aarch64.

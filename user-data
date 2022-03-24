@@ -1,0 +1,48 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: myvm
+    username: ubuntu
+    password: "$6$exDY1mhS4KUYCE/2$zmn9ToZwTKLhCw.b4/b.ZRTIZM30JZ4QrOQ2aOXJ8yk96xpcCof0kxKwuX1kqLG/ygbJ1f8wxED22bTL4F46P0"
+  ssh:
+    install-server: true
+  packages:
+    - alien
+    - emacs
+    - git
+    - less
+    - spice-vdagent
+    - spice-webdavd
+    - texlive
+    - texlive-latex-extra
+    - texlive-fonts-extra
+    - texlive-plain-generic
+    - ubuntu-mate-core
+  late-commands:
+    - curl --silent --location https://micromamba.snakepit.net/api/micromamba/linux-$(uname -m)/latest | tar -xvj -C /target/usr/local bin/micromamba
+    - burl="https://dl.fedoraproject.org/pub/epel/8/Everything/$(uname -m)/Packages/s/" && rpm=`curl --silent $burl | sed -n -E 's#^.+href="(singularity-[^"]+)".+$#\1#p'` && curl --silent --output /target/root/$rpm $burl$rpm && curtin in-target --target=/target -- alien --to-deb --install --target `dpkg --print-architecture` /root/$rpm
+    - shutdown now
+  user-data:
+    runcmd:
+      - su ubuntu -c "micromamba shell init -s bash -p /home/ubuntu/.micromamba"
+      - |
+        cat <<EOF | sudo -u ubuntu tee -a /home/ubuntu/.bashrc
+        
+        # >>> mycidata initialize >>>
+        alias conda=micromamba
+        alias mamba=micromamba
+        function conda_auto_env() {
+          if [ -e "environment.yml" ]; then
+            ENV_NAME=\$(head -n 1 environment.yml | cut -f2 -d " " | sed -e "s/'//g")
+            if [[ \$CONDA_PREFIX != *\$ENV_NAME* ]]; then
+              conda activate \$ENV_NAME &>/dev/null
+            fi
+          else
+            conda activate base &> /dev/null
+          fi
+        }
+        export PROMPT_COMMAND="conda_auto_env;\$PROMPT_COMMAND"
+        # <<< mycidata initialize<<<
+        EOF
+      - su ubuntu -l -c "micromamba install snakemake -c conda-forge -c bioconda"
