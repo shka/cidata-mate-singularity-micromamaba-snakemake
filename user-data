@@ -18,13 +18,16 @@ autoinstall:
     - texlive-latex-extra
     - texlive-fonts-extra
     - texlive-plain-generic
-    - ubuntu-mate-core
+    - xfce4
+    - xfce4-terminal
   late-commands:
-    - curl --silent --location https://micromamba.snakepit.net/api/micromamba/linux-$(uname -m)/latest | tar -xvj -C /target/usr/local bin/micromamba
+    - curl --silent --location https://micromamba.snakepit.net/api/micromamba/linux-`echo $(uname -m) | sed -e s/x86_//`/latest | tar -xvj -C /target/usr/local bin/micromamba
     - burl="https://dl.fedoraproject.org/pub/epel/8/Everything/$(uname -m)/Packages/s/" && rpm=`curl --silent $burl | sed -n -E 's#^.+href="(singularity-[^"]+)".+$#\1#p'` && curl --silent --output /target/root/$rpm $burl$rpm && curtin in-target --target=/target -- alien --to-deb --install --target `dpkg --print-architecture` /root/$rpm
     - shutdown now
   user-data:
     runcmd:
+      - lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+      - resize2fs /dev/ubuntu-vg/ubuntu-lv
       - su ubuntu -c "micromamba shell init -s bash -p /home/ubuntu/.micromamba"
       - |
         cat <<EOF | sudo -u ubuntu tee -a /home/ubuntu/.bashrc
@@ -45,4 +48,4 @@ autoinstall:
         export PROMPT_COMMAND="conda_auto_env;\$PROMPT_COMMAND"
         # <<< mycidata initialize<<<
         EOF
-      - su ubuntu -l -c "micromamba install snakemake -c conda-forge -c bioconda"
+      - su ubuntu -c "bash -l -c 'micromamba install snakemake -c conda-forge -c bioconda'"
