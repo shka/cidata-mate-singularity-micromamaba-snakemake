@@ -1,4 +1,4 @@
-#+TITLE: cidata-mate-singularity-micromamba-snakemake
+#+TITLE: cidata-xfce-singularity-micromamba-snakemake
 
 This is cidata to install and configure Ubuntu with MATE desktop,
 singularity, micromamba and snakemake via [[https://ubuntu.com/server/docs/install/autoinstall][Ubuntu's autoinstall]]
