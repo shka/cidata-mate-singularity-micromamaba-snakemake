@@ -14,6 +14,7 @@ autoinstall:
     - less
     - spice-vdagent
     - spice-webdavd
+    - sshfs
     - texlive
     - texlive-latex-extra
     - texlive-fonts-extra
